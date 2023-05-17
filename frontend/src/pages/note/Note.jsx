@@ -8,24 +8,16 @@ import Cookies from 'js-cookie';
 import { format } from 'fecha';
 import { AxiosError } from 'axios';
 import GlobalContext from '../../share/context/GlobalContext';
-
+import React, { useContext } from 'react';
 const Note = () => {
+  const {noteId} = useParams();
+  const { setStatus } = useContext(GlobalContext);
   const navigate = useNavigate();
-  const [user, setStatus] = useContext(GlobalContext);
   const [note, setNote] = useState({});
   const [openEdit, setOpenEdit] = useState(false);
-  const { noteId } = useParams();
-
-  useEffect(() => {
-    // 1. call API to get a note
-    const userToken = Cookies.get('UserToken');
-    Axios.get(`/note/${noteId}`, { headers: { Authorization: `Bearer ${userToken}` } })
-    .then((res) => {
-      // 2. if success, set note to state
-      setNote(res.data.data);
-    });
-  }, [user]);
-
+  useEffect(() => {// 1. call API to get a note
+    const userToken = Cookies.get('UserToken');Axios.get(`/note/${noteId}`, { headers: { Authorization: `Bearer ${userToken}` } }).then((res) => {// 2. if success, set note to state
+      setNote(res.data.data);});}, []);
   const handleNoteEditOpen = () => {
     setOpenEdit(true);
   };
@@ -43,16 +35,16 @@ const Note = () => {
 
       if (response.data.success) {
         // TODO: show status of success here
-        setStatus({ severity: 'success', msg: 'Delete note successfully'});
+        setStatus({ severity: 'success', msg: 'Delete note successfully' })
         navigate(-1);
       }
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         // TODO: show status of error from AxiosError here
-        setStatus({ severity: 'error', msg: error.response.data.error});
+        setStatus({ severity: 'error', msg: error.response.data.error });
       } else {
         // TODO: show status of other errors here
-        setStatus({ severity: 'error', msg: error.message});
+        setStatus({ severity: 'error', msg: error.message });
       }
     }
   };
